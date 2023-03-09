@@ -2,12 +2,13 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <sys/time.h>
+#include "avl.c"
 #include "avl.h"
 
 
 int FindMinPath(struct AVLTree *tree, TYPE *path);
 void printBreadthFirstTree(struct AVLTree *tree);
-
+void print_level(struct AVLnode* root, int height);
 
 /* -----------------------
 The main function
@@ -21,10 +22,11 @@ int main(int argc, char** argv) {
 	struct timeval stop, start; /* variables for measuring execution time */
 	int pathArray[100];  /* static array with values of nodes along the min-cost path of the AVL tree. The means that the depth of the AVL tree cannot be greater than 100 which is  sufficient for our purposes*/
 
-	struct AVLTree *tree;
+	struct AVLTree *tree;  
 	
 	tree = newAVLTree(); /*initialize and return an empty tree */
 	
+	printf("g");
 	file = fopen(argv[1], "r"); 	/* filename is passed in argv[1] */
 	assert(file != 0);
 
@@ -77,24 +79,44 @@ Finds the minimum-cost path in an AVL tree
 int FindMinPath(struct AVLTree *tree, TYPE *path)
 {
                /* FIX ME */
-        
+        return 1;
 
 }
 
 
+void printLevel(struct AVLnode* root, int height) {
+    if (!root)
+        return;
+    if (height == 0) {
+        printf("Val: %d Below: %d\n ", root->val, root->height);
+    }
+    else if(height > 0) {
+        printLevel(root->left, height - 1);
+        printLevel(root->right, height - 1);
+    }
+
+}
 
 /* -----------------------
 Printing the contents of an AVL tree in breadth-first fashion
   param: pointer to a tree
   pre: assume that tree was initialized well before calling this function
 */
+
 void printBreadthFirstTree(struct AVLTree *tree)
 {
-   
+   int i;
+   printf("Height of Root: %d\n",tree->root->height);
+   for(i =0; i<= tree->root->height; i++) {
+       printLevel(tree->root, i);
+   }
     /* FIX ME */
 
 
 }
+
+
+
 
 
 

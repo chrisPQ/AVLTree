@@ -9,7 +9,7 @@ struct AVLTree * newAVLTree()
 {
 	struct AVLTree *tree = (struct AVLTree *)malloc(sizeof(struct AVLTree));
 	assert(tree != 0);
-	
+
 	initAVLTree(tree);
 	return tree;
 }
@@ -26,7 +26,7 @@ void _freeAVL(struct AVLnode *node)
 {
 	if (node != 0) {
 		_freeAVL(node->left);
-		_freeAVL(node->right);		
+		_freeAVL(node->right);
 		free(node);
 	}
 }
@@ -56,7 +56,7 @@ int h(struct AVLnode *current)
 }
 
 /* set height for current node */
-void setHeight (struct AVLnode * current)
+void setHeight(struct AVLnode * current)
 {
 	int lch = h(current->left);
 	int rch = h(current->right);
@@ -76,7 +76,12 @@ int bf(struct AVLnode * current)
 struct AVLnode * rotateLeft(struct AVLnode * current)
 {
 	struct AVLnode * newtop = current->right;
-
+ 
+  current->right = newtop->left;
+  newtop->left = current;
+  
+  setHeight(current);
+  setHeight(newtop);
 
     /* FIX ME */
 
@@ -89,6 +94,11 @@ struct AVLnode * rotateLeft(struct AVLnode * current)
 struct AVLnode * rotateRight(struct AVLnode * current)
 {
 	struct AVLnode * newtop = current->left;
+  current->left = newtop->right;
+  newtop->right = current;
+  setHeight(current);
+  setHeight(newtop);
+ 
 
 
         /* FIX ME */
@@ -101,7 +111,12 @@ struct AVLnode * _balance(struct AVLnode * current)
 {
 	int cbf = bf(current);
 
-
+  if(cbf > 1) {
+    current = rotateRight(current);
+  }
+  if(cbf < -1) {
+    current = rotateLeft(current);
+  }
 
        /* FIX ME */
 
@@ -113,18 +128,27 @@ struct AVLnode * _balance(struct AVLnode * current)
 /* add newValue to subtree of current node */
 struct AVLnode * AVLnodeAdd(struct	AVLnode * current, TYPE newValue)
 {
-
-
-     /* FIX ME */
-
-
+    if (current == 0){/*make a new node, and return new*/
+        struct AVLnode * newNode = (struct AVLnode *) malloc(sizeof(struct AVLnode));
+        assert(newNode != 0);
+        newNode->val = newValue;
+        newNode->left = newNode->right = 0;
+        return newNode;
+    }
+    else {/* call recursion left or right */
+        if (newValue < current->val)
+            current->left = AVLnodeAdd(current->left, newValue);
+        else
+            current->right = AVLnodeAdd(current->right, newValue);
+    }
+    return _balance(current);
 
 }
 
 /* add val to AVL tree */
 void addAVLTree(struct AVLTree *tree, TYPE val)
 {
-	tree->root = AVLnodeAdd(tree->root, val);	
+	tree->root = AVLnodeAdd(tree->root, val);
 	tree->cnt++;
 }
 
@@ -134,7 +158,7 @@ int containsAVLTree(struct AVLTree *tree, TYPE val)
 	struct AVLnode* cur = tree->root;
 
 	while(cur != 0){
-		if (EQ(cur->val, val))	
+		if (EQ(cur->val, val))
 			return 1;
 		else if (LT(val, cur->val))
 			cur = cur->left;
@@ -142,7 +166,7 @@ int containsAVLTree(struct AVLTree *tree, TYPE val)
 			cur = cur->right;
 	}
 
-	return 0; 
+	return 0;
 }
 
 /* find leftmost value from subtree of current node */
@@ -221,14 +245,13 @@ struct AVLnode * _removeAllNodes(struct AVLTree * tree, struct AVLnode * cur, TY
          cur = temp;
       }
    }
-   if (cur){  
+   if (cur){
       if (LT(val, cur->val))
          cur->left = _removeAllNodes(tree,cur->left, val);
-      else 
+      else
          cur->right = _removeAllNodes(tree,cur->right, val);
    }
    return _balance(cur);
-  
-}
 
+}
 
